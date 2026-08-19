@@ -1,3 +1,8 @@
+RewriteEngine On
+RewriteCond %{HTTPS} !=on [OR]
+RewriteCond %{HTTP_HOST} !^heemachhabra\.com$ [NC]
+RewriteRule ^ https://heemachhabra.com%{REQUEST_URI} [R=301,L,NE]
+
 ErrorDocument 404 /404.html
 
 <IfModule mod_headers.c>
