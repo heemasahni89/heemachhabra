@@ -1,0 +1,32 @@
+# Local and generated metadata
+.commandcode/
+.git/
+
+# Briefing and source archives
+*.pptx
+*.ppt
+*.rar
+*.zip
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Local tooling output
+node_modules/
+coverage/
+test-results/
+playwright-report/
+reports/
+screenshots/
+site-release.tar.gz
+*.log
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
