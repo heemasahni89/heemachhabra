@@ -21,6 +21,11 @@
 - Baseline commit and tag pushed to GitHub.
 - Migration script runs idempotently.
 - Patched HTML div counts remain balanced.
+- Local deterministic validation passed; 94-file production archive packaged without repository/docs/script metadata.
+- GitHub Actions validation run `32230224003` passed on the working branch.
+- Local HTTP checks passed for homepage, robots, sitemap, required assets, and true 404.
+- Live pre-deployment comparison: homepage 200, robots/sitemap 404, proving the new release was not deployed.
+- Local baseline HTTP server stopped after testing.
 
 ## Current blockers
 
