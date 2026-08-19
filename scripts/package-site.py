@@ -13,7 +13,7 @@ def include(path):
     relative = path.relative_to(ROOT)
     if any(part in EXCLUDED_PARTS for part in relative.parts):
         return False
-    if path.name in EXCLUDED_NAMES or path.name.startswith(".env"):
+    if path.name in EXCLUDED_NAMES or path.name.startswith(".env") or path.name == ".gitignore":
         return False
     if path.suffix.lower() in {".rar", ".zip", ".log", ".key", ".pem"}:
         return False

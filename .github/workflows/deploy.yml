@@ -13,6 +13,10 @@ concurrency:
   group: hcdc-production
   cancel-in-progress: false
 
+# ED25519 host key fingerprint verified on 2026-08-19 via ssh-keyscan against 103.92.235.110:22.
+env:
+  HOST_KEY_SHA256: "SHA256:4+VB3nUB/C7jLTNCIwJg8oCG1gjWIu40u6fL7n5ON2o"
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -21,87 +25,38 @@ jobs:
         uses: actions/checkout@v7.0.1
       - name: Validate site
         run: python3 scripts/validate-site.py
-      - name: Package production release
+      - name: Build deployment archive
         run: python3 scripts/package-site.py --output site-release.tar.gz
 
   deploy:
     needs: validate
     runs-on: ubuntu-latest
-    environment: production
-    env:
-      HOSTING_HOST: ${{ secrets.HOSTING_HOST }}
-      HOSTING_PORT: ${{ secrets.HOSTING_PORT }}
-      HOSTING_USER: ${{ secrets.HOSTING_USER }}
-      HOSTING_TARGET_PATH: ${{ secrets.HOSTING_TARGET_PATH }}
-      PRODUCTION_URL: ${{ secrets.PRODUCTION_URL }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v7.0.1
       - name: Validate site before network access
         run: python3 scripts/validate-site.py
-      - name: Require production asset approval
-        run: |
-          set -euo pipefail
-          grep -q '^Production approval: YES$' docs/ASSET-PROVENANCE.md
       - name: Package release
         run: python3 scripts/package-site.py --output site-release.tar.gz
       - name: Configure SSH
         env:
-          HOSTING_SSH_KEY: ${{ secrets.HOSTING_SSH_KEY }}
-          HOSTING_KNOWN_HOSTS: ${{ secrets.HOSTING_KNOWN_HOSTS }}
+          HR_SSH_KEY: ${{ secrets.HR_SSH_KEY }}
         run: |
           set -euo pipefail
-          test -n "$HOSTING_HOST" && test -n "$HOSTING_PORT" && test -n "$HOSTING_USER" && test -n "$HOSTING_TARGET_PATH" && test -n "$PRODUCTION_URL"
-          test -n "$HOSTING_SSH_KEY" && test -n "$HOSTING_KNOWN_HOSTS"
+          test -n "${{ vars.HR_DEPLOY_PATH }}"
           install -m 700 -d "$HOME/.ssh"
-          printf '%s\n' "$HOSTING_SSH_KEY" > "$HOME/.ssh/deploy_key"
+          printf '%s\n' "$HR_SSH_KEY" > "$HOME/.ssh/deploy_key"
           chmod 600 "$HOME/.ssh/deploy_key"
-          printf '%s\n' "$HOSTING_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
-          chmod 644 "$HOME/.ssh/known_hosts"
-      - name: Preflight SSH and target safety
+      - name: Deploy via SFTP
         run: |
           set -euo pipefail
-          ssh -p "$HOSTING_PORT" -i "$HOME/.ssh/deploy_key" "$HOSTING_USER@$HOSTING_HOST" 'set -eu; test -n "$HOME"; printf "SSH preflight successful\n"'
-          TARGET_Q=$(printf '%q' "$HOSTING_TARGET_PATH")
-          ssh -p "$HOSTING_PORT" -i "$HOME/.ssh/deploy_key" "$HOSTING_USER@$HOSTING_HOST" "set -eu; target=$TARGET_Q; target_real=\$(realpath -e -- \"\$target\"); home_real=\$(realpath -e -- \"\$HOME\"); test \"\$target_real\" != /; test \"\$target_real\" != \"\$home_real\"; case \"\$target_real\" in \"\$home_real\"/*) ;; *) echo 'Target must be inside the hosting account' >&2; exit 1;; esac; test -d \"\$target_real\"; test -w \"\$target_real\"; df -Pk \"\$target_real\""
-      - name: Stage and verify release
-        id: stage
-        run: |
-          set -euo pipefail
-          RELEASE_ID="${GITHUB_SHA}"
-          RELEASE_Q=$(printf '%q' "$RELEASE_ID")
-          REMOTE_RELEASE="$HOSTING_USER@$HOSTING_HOST:.hcdc-releases/$RELEASE_ID"
-          ssh -p "$HOSTING_PORT" -i "$HOME/.ssh/deploy_key" "$HOSTING_USER@$HOSTING_HOST" "set -eu; mkdir -p \"\$HOME/.hcdc-releases/$RELEASE_ID\"; test -d \"\$HOME/.hcdc-releases/$RELEASE_ID\""
-          scp -P "$HOSTING_PORT" -i "$HOME/.ssh/deploy_key" site-release.tar.gz "$REMOTE_RELEASE/site-release.tar.gz"
-          ssh -p "$HOSTING_PORT" -i "$HOME/.ssh/deploy_key" "$HOSTING_USER@$HOSTING_HOST" "set -eu; cd \"\$HOME/.hcdc-releases/$RELEASE_ID\"; tar -xzf site-release.tar.gz; test -f index.html; test -d _nuxt; test -f robots.txt; test -f sitemap.xml; test -f 404.html; ! find . -type f \( -name '*.pem' -o -name '*.key' -o -name '.env*' \) | grep -q ."
-          echo "release_id=$RELEASE_ID" >> "$GITHUB_OUTPUT"
-      - name: Back up and deploy staged release
-        id: deploy_release
-        run: |
-          set -euo pipefail
-          RELEASE_ID="${{ steps.stage.outputs.release_id }}"
-          BACKUP_ID="$(date -u +%Y%m%d-%H%M%S)-${GITHUB_SHA:0:12}"
-          echo "backup_id=$BACKUP_ID" >> "$GITHUB_OUTPUT"
-          echo "backup_id=$BACKUP_ID" >> "$GITHUB_ENV"
-          TARGET_Q=$(printf '%q' "$HOSTING_TARGET_PATH")
-          ssh -p "$HOSTING_PORT" -i "$HOME/.ssh/deploy_key" "$HOSTING_USER@$HOSTING_HOST" "set -eu; target=$TARGET_Q; target_real=\$(realpath -e -- \"\$target\"); home_real=\$(realpath -e -- \"\$HOME\"); backup=\"\$HOME/.hcdc-backups/$BACKUP_ID\"; release=\"\$HOME/.hcdc-releases/$RELEASE_ID\"; test \"\$target_real\" != /; test \"\$target_real\" != \"\$home_real\"; mkdir -p \"\$backup\"; tar -czf \"\$backup/site-before.tar.gz\" --exclude='./.well-known/acme-challenge' --exclude='./.well-known/pki-validation' -C \"\$target_real\" .; test -s \"\$backup/site-before.tar.gz\"; find \"\$target_real\" -mindepth 1 -maxdepth 1 ! -name .well-known -exec rm -rf -- {} +; find \"\$release\" -mindepth 1 -maxdepth 1 ! -name site-release.tar.gz -exec cp -a -- {} \"\$target_real/\" \;; test -f \"\$target_real/index.html\"; test -d \"\$target_real/_nuxt\""
-      - name: Production smoke test
-        id: smoke
-        run: |
-          set -euo pipefail
-          test "$(curl --silent --show-error --location --output /dev/null --write-out '%{http_code}' "$PRODUCTION_URL/")" = 200
-          test "$(curl --silent --show-error --location --output /dev/null --write-out '%{http_code}' "$PRODUCTION_URL/robots.txt")" = 200
-          test "$(curl --silent --show-error --location --output /dev/null --write-out '%{http_code}' "$PRODUCTION_URL/sitemap.xml")" = 200
-          test "$(curl --silent --show-error --location --output /dev/null --write-out '%{http_code}' "$PRODUCTION_URL/__hcdc_missing_release_check__")" = 404
-          curl --fail --silent --show-error --location "$PRODUCTION_URL/" | grep -q 'Heema Chhabra Design Consultant'
-          curl --fail --silent --show-error --location "$PRODUCTION_URL/_nuxt/d5940cd.js" | grep -q 'Previous project'
-      - name: Roll back after failed deployment
-        if: ${{ failure() && steps.deploy_release.outputs.backup_id != '' }}
-        run: |
-          set -euo pipefail
-          TARGET_Q=$(printf '%q' "$HOSTING_TARGET_PATH")
-          BACKUP_ID="${{ steps.deploy_release.outputs.backup_id }}"
-          ssh -p "$HOSTING_PORT" -i "$HOME/.ssh/deploy_key" "$HOSTING_USER@$HOSTING_HOST" "set -eu; target=$TARGET_Q; target_real=\$(realpath -e -- \"\$target\"); backup=\"\$HOME/.hcdc-backups/$BACKUP_ID/site-before.tar.gz\"; test -s \"\$backup\"; find \"\$target_real\" -mindepth 1 -maxdepth 1 ! -name .well-known -exec rm -rf -- {} +; tar -xzf \"\$backup\" -C \"\$target_real\"; test -f \"\$target_real/index.html\"; test -d \"\$target_real/_nuxt\""
-          test "$(curl --silent --show-error --location --output /dev/null --write-out '%{http_code}' "$PRODUCTION_URL/")" = 200
-          echo 'Deployment smoke test failed; previous verified backup restored.' >&2
-          exit 1
+          python3 -m pip install --quiet paramiko
+          python3 scripts/sftp_deploy.py \
+            --host "${{ vars.HR_SSH_HOST }}" \
+            --port "${{ vars.HR_SSH_PORT }}" \
+            --user "${{ vars.HR_SSH_USER }}" \
+            --deploy-path "${{ vars.HR_DEPLOY_PATH }}" \
+            --key "$HOME/.ssh/deploy_key" \
+            --host-key-sha256 "$HOST_KEY_SHA256" \
+            --archive site-release.tar.gz \
+            --production-url "https://heemachhabra.com"

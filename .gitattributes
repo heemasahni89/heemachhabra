@@ -1,0 +1,6 @@
+# Force LF line endings for text files in the working tree and index.
+# Prevents autocrlf from rewriting LF -> CRLF on Windows checkouts,
+# which would otherwise alter committed workflow/script content.
+.github/workflows/*.yml text eol=lf
+.github/workflows/*.yaml text eol=lf
+scripts/*.py text eol=lf
