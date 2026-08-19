@@ -2,6 +2,8 @@
 
 The supplied download contains hashed JPEGs, local WOFF2 fonts, an Instagram SVG, and a portrait image. No licence manifest, photographer release, ownership statement, or source asset metadata was supplied.
 
+Production approval: NO
+
 | Asset group | Page/location | Provenance/owner | Production-approved |
 |---|---|---|---|
 | `_nuxt/img/screen*.jpg` | Existing gallery/portfolio runtime | Supplied in downloaded site; owner/licence unverified | No — confirmation required |

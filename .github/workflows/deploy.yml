@@ -39,6 +39,10 @@ jobs:
         uses: actions/checkout@v4
       - name: Validate site before network access
         run: python3 scripts/validate-site.py
+      - name: Require production asset approval
+        run: |
+          set -euo pipefail
+          grep -q '^Production approval: YES$' docs/ASSET-PROVENANCE.md
       - name: Package release
         run: python3 scripts/package-site.py --output site-release.tar.gz
       - name: Configure SSH
@@ -63,7 +67,7 @@ jobs:
         run: |
           set -euo pipefail
           RELEASE_ID="${GITHUB_SHA}"
-          REMOTE_RELEASE="$HOSTING_USER@$HOSTING_HOST:$HOME/.hcdc-releases/$RELEASE_ID"
+          REMOTE_RELEASE="$HOSTING_USER@$HOSTING_HOST:.hcdc-releases/$RELEASE_ID"
           ssh -p "$HOSTING_PORT" -i "$HOME/.ssh/deploy_key" "$HOSTING_USER@$HOSTING_HOST" "set -eu; mkdir -p \"\$HOME/.hcdc-releases/$RELEASE_ID\"; test -d \"\$HOME/.hcdc-releases/$RELEASE_ID\""
           scp -P "$HOSTING_PORT" -i "$HOME/.ssh/deploy_key" site-release.tar.gz "$REMOTE_RELEASE/site-release.tar.gz"
           ssh -p "$HOSTING_PORT" -i "$HOME/.ssh/deploy_key" "$HOSTING_USER@$HOSTING_HOST" "set -eu; cd \"\$HOME/.hcdc-releases/$RELEASE_ID\"; tar -xzf site-release.tar.gz; test -f index.html; test -d _nuxt; test -f robots.txt; test -f sitemap.xml; test -f 404.html"

@@ -1,6 +1,6 @@
 # Execution state
 
-- **Current phase:** generated-build HCDC migration and release framework
+- **Current phase:** local release gate complete; production deployment blocked on verified HostingRaja configuration, browser tooling, and asset approval
 - **Baseline commit:** `8df58c1` (`chore: import current production website`)
 - **Baseline tag:** `baseline-before-hcdc-refresh-20260819`
 - **Working branch:** `production/hcdc-content-seo-refresh`
@@ -9,8 +9,9 @@
 - **Architecture:** static Nuxt/Vue generated export; no source/build project included.
 - **SSH key:** existing `~/.ssh/heema_github_actions` material detected; no new key created.
 - **Browser tooling:** `agent-browser` command unavailable in this environment; browser screenshots/hydration checks remain outstanding.
-- **Hosting target:** not yet verified; no deployment attempted.
-- **Image provenance:** not verified; existing downloaded images are retained only to preserve the baseline visual template and must be confirmed before production publication.
+- **Hosting target:** not yet verified; no deployment attempted. No `production` environment secrets are currently configured in GitHub.
+- **Image provenance:** not verified; deployment workflow is explicitly blocked by `Production approval: NO` until the owner confirms rights.
+- **Known SSH host:** `190.92.174.186` is present in local known_hosts, but it does not match the public domain A record (`103.92.235.110`) and cannot be assumed to be HostingRaja for this site.
 
 ## Completed checks
 
