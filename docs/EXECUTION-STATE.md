@@ -1,6 +1,6 @@
 # Execution state
 
-- **Current phase:** local release gate complete; production deployment blocked on verified HostingRaja configuration, browser tooling, and asset approval
+- **Current phase:** re-audit complete; production deployment blocked on verified HostingRaja configuration, browser tooling, and asset approval
 - **Baseline commit:** `8df58c1` (`chore: import current production website`)
 - **Baseline tag:** `baseline-before-hcdc-refresh-20260819`
 - **Working branch:** `production/hcdc-content-seo-refresh`
@@ -24,8 +24,13 @@
 - Local deterministic validation passed; 94-file production archive packaged without repository/docs/script metadata.
 - GitHub Actions validation run `32230224003` passed on the working branch.
 - Local HTTP checks passed for homepage, robots, sitemap, required assets, and true 404.
+- Re-audit removed the final residual Rhode Saint Genèse/Belgium template caption and replaced all neutral captions with `HCDC — selected interior composition`.
+- Re-audit completed image alt coverage for all 239 images in both SSR copies.
+- Re-audit normalized the primary intro to one valid H1 and the About title/content to H2 headings.
+- Every compiled JS bundle passed `node --check`; migration remained idempotent across repeated runs.
+- Latest GitHub validation run `32230901960` passed.
 - Live pre-deployment comparison: homepage 200, robots/sitemap 404, proving the new release was not deployed.
-- Local baseline HTTP server stopped after testing.
+- Local final HTTP server stopped after testing.
 
 ## Current blockers
 
