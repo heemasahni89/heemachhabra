@@ -7,7 +7,7 @@ from html.parser import HTMLParser
 
 ROOT = Path(__file__).resolve().parents[1]
 CANONICAL = "https://heemachhabra.com/"
-FORBIDDEN = ["Heema Sahni", "SAHNI", "Naguissa", "NTD", "Paris 16", "Paris 7", "Uccle", "Biarritz", "Ramatuelle", "Brussels, Belgium", "Alexis Toureau", "Catalina Mesa", "Caféine", "Cafeine", "Spectrum", "Emmanuel Bonnewijn", "Johanna Amatoury"]
+FORBIDDEN = ["Heema Sahni", "SAHNI", "Naguissa", "NTD", "Galerie Jean-Jacques Dutko", "Design Basel 2012", "Paris 16", "Paris 7", "Uccle", "Biarritz", "Ramatuelle", "Brussels, Belgium", "Rhode Saint", "Rhodes Saint", "Belgium", "Alexis Toureau", "Catalina Mesa", "Caféine", "Cafeine", "Spectrum", "Emmanuel Bonnewijn", "Johanna Amatoury", "Born and raised", "Designing all aspects", "interior architecture", "Selected interior composition", "HCDC — selected interior composition", "HCDC � selected interior composition", "Interior Design: HCDC"]
 REQUIRED = ["index.html", "robots.txt", "sitemap.xml", "404.html", "_nuxt/index.html", "_nuxt/static/1679938011/payload.js"]
 
 class HTMLChecks(HTMLParser):

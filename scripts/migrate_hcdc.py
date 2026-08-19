@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -14,8 +15,17 @@ CANONICAL = "https://heemachhabra.com/"
 
 ABOUT_BLOCK = '''<div class="about tw-fixed tw-right-0 lg:tw-h-screen tw-bg-black tw-z-40" role="dialog" aria-modal="true" aria-labelledby="hcdc-about-title"><button class="btn-close tw-absolute tw-right-6 lg:tw-right-20 tw-z-20 tw-font-grotesk-rg tw-text-sm tw-text-white focus:tw-outline-none focus:tw-ring-0 nocursor" type="button" aria-label="Close About and Contact panel">Close</button> <div class="lg:tw-grid tw-grid-cols-8 lg:tw-gap-20 tw-px-6 lg:tw-px-20 tw-py-6 lg:tw-py-20 tw-box-border about-content"><figure class="tw-w-1/2 lg:tw-w-full lg:tw-col-span-3 jsImage"><img data-src="/_nuxt/img/portrait-hcdc.jpg" alt="Heema Chhabra, founder of HCDC" class="tw-w-full tw-block tw-h-auto lazyLoad"></figure> <div class="lg:tw-col-span-4 tw-relative tw--top-2 tw-mt-20 lg:tw-mt-0 jsText"><h1 id="hcdc-about-title" class="tw-font-times-lt tw-text-2xl tw-text-white">Bespoke Interior Design in London</h1> <div class="tw-block lg:tw-hidden jsActions2"><a href="mailto:info@heemachhabra.com" rel="nofollow" class="tw-block tw-font-grotesk-rg tw-text-sm tw-text-white tw-underline tw-mt-10">info@heemachhabra.com</a> <a href="https://www.instagram.com/heemachhabradesignconsultant/" target="_blank" rel="noopener noreferrer" class="tw-block tw-underline tw-font-grotesk-rg tw-text-sm tw-text-white tw-block lg:tw-inline-block tw-mt-4 lg:tw-mt-0"><img data-src="/_nuxt/img/instagram.b6014cf.svg" alt="" class="tw-w-3 tw-h-3 tw-inline-block tw-mr-2 tw-relative lazyLoad" style="top:2px">Follow on Instagram</a></div> <div class="desc-about tw-font-grotesk-rg tw-text-white tw-text-sm lg:tw-text-xs tw-leading-5 lg:tw-leading-4"><h2>Heema Chhabra Design Consultant is a London-based interior design studio creating considered interiors for private homes, commercial spaces and property development projects.</h2><p>We begin with how a space needs to work and how people want to feel within it, then develop a cohesive design through spatial planning, materials, lighting, furniture, bespoke joinery and carefully resolved detail.</p><h2>Beauty with Purpose</h2><p>A successful interior should be as intuitive to live in as it is compelling to look at. Proportion, circulation, light, texture, storage and everyday use are considered as one connected composition.</p><h2>A Considered Approach to Every Project</h2><p>We understand the brief, establish a clear design direction, curate materials and furnishings, resolve the detail, and support a thoughtful handover. The scope is shaped around each property and project.</p><h2>Interior Design Services</h2><p>HCDC offers residential interior design, private residence schemes, commercial interiors and builder or property-development design support where appropriate. Services may include space planning, materials, lighting, joinery, furniture and finishing details.</p><p>Every project begins with a conversation. Tell us where the project is, what you would like to change and the stage you are at.</p></div></div> <div class="actions tw-hidden lg:tw-grid tw-grid-cols-8 lg:tw-gap-20 tw-px-6 lg:tw-px-20 lg:tw-py-20 tw-box-border lg:tw-absolute tw-bottom-0 tw-left-0 tw-w-full tw-mt-20 lg:tw-mt-0 jsActions"><div class="lg:tw-col-start-4 lg:tw-col-span-5 tw-relative"><a href="mailto:info@heemachhabra.com" rel="nofollow" class="btn tw-font-grotesk-rg tw-text-sm tw-text-white tw-underline">info@heemachhabra.com</a> <a href="https://www.instagram.com/heemachhabradesignconsultant/" target="_blank" rel="noopener noreferrer" class="btn tw-underline tw-font-grotesk-rg tw-text-sm tw-text-white tw-block lg:tw-inline-block tw-mt-4 lg:tw-mt-0"><img data-src="/_nuxt/img/instagram.b6014cf.svg" alt="" class="tw-w-3 tw-h-3 tw-inline-block tw-mr-2 tw-relative lazyLoad" style="top:2px">Follow on Instagram</a></div></div> <a href="mailto:info@heemachhabra.com" rel="nofollow" class="tw-relative lg:tw-absolute tw-left-6 lg:tw-left-20 tw-bottom-5 lg:tw-bottom-20 tw-font-grotesk-rg tw-text-sm tw-text-white tw-text-opacity-40 jsCredit">Start a conversation</a></div>'''
 
+ABOUT_CONTENT_BLOCK = '''<div class="desc-about tw-font-grotesk-rg tw-text-white tw-text-sm lg:tw-text-xs tw-leading-5 lg:tw-leading-4"><p>Heema Chhabra Design Consultant is a London-based interior design studio creating considered interiors for private homes, commercial spaces and property development projects.</p><h2>Beauty with Purpose</h2><p>A successful interior should be as intuitive to live in as it is compelling to look at. Proportion, circulation, light, texture, storage and everyday use are considered as one connected composition.</p><h2>A Considered Approach to Every Project</h2><p>We do not begin with a predetermined look. Every project starts by understanding the people, place and purpose behind the space.</p><h3>Understand</h3><p>We establish how the space is used, what needs to change and the atmosphere the client wants to create.</p><h3>Conceptualise</h3><p>The brief becomes a clear design direction through spatial planning, layout, materials, colour and light.</p><h3>Curate</h3><p>Materials, finishes, furniture, lighting, fabrics, artwork and accessories are considered as one composition.</p><h3>Detail</h3><p>Joinery, transitions, proportions, finishes and practical details are resolved from the overall space to its smallest elements.</p><h3>Design Development &amp; Handover</h3><p>The scope is shaped around the property and project, with design information developed for a thoughtful handover.</p><h3>Experience</h3><p>A successful interior is measured by how naturally it supports the people who live, work or spend time there.</p><h2>Interior Design Services</h2><p>HCDC tailors its scope to each property and project rather than treating every service as automatic.</p><h3>Residential Interior Design</h3><p>Homes designed around the people who live in them, bringing together function, comfort, proportion, materiality and detail.</p><h3>Private Residences</h3><p>More comprehensive design direction for private homes, considering architecture, materials, furniture, lighting, joinery and decorative layers together.</p><h3>Commercial Interior Design</h3><p>Commercial spaces shaped around identity, functionality, circulation, atmosphere, durability and the experience of the people using them.</p><h3>Builder &amp; Property Development</h3><p>Design support for builders and developers where appropriate, balancing design identity, buyer appeal, functionality and considered specification.</p><h2>Start a Conversation</h2><p>Every project begins with a conversation. Tell us where the project is, what you would like to change and the stage you are at.</p></div>'''
 ABOUT_BLOCK = ABOUT_BLOCK.replace('<h1 id="hcdc-about-title"', '<h2 id="hcdc-about-title"').replace('</h1> <div class="tw-block lg:tw-hidden jsActions2">', '</h2> <div class="tw-block lg:tw-hidden jsActions2">')
-GENERIC_CAPTION = "HCDC — selected interior composition"
+about_start = ABOUT_BLOCK.index('<div class="desc-about')
+about_end = ABOUT_BLOCK.index('</div></div> <div class="actions', about_start)
+ABOUT_BLOCK = ABOUT_BLOCK[:about_start] + ABOUT_CONTENT_BLOCK + ABOUT_BLOCK[about_end + len('</div>') :]
+ABOUT_PAYLOAD_HTML = re.search(r'<div class="desc-about[^>]*>(.*)</div>', ABOUT_CONTENT_BLOCK, re.DOTALL).group(1)
+ABOUT_TITLE = "Bespoke Interior Design in London"
+GENERIC_CAPTION = ""
+ABOUT_DESCRIPTION = "Heema Chhabra Design Consultant is a London-based interior design studio creating considered interiors for private homes, commercial spaces and property development projects."
+ABOUT_CONTENT_1 = "We begin with how a space needs to work and how people want to feel within it, then develop a cohesive design through spatial planning, materials, lighting, furniture, bespoke joinery and carefully resolved detail."
+ABOUT_CONTENT_2 = "Our approach is client-led: clear spatial planning, balanced palettes, tactile materials, considered light and practical detail are brought together to create interiors with purpose, character and longevity."
 
 
 def replace_once(text, old, new, label):
@@ -37,6 +47,16 @@ def patch_html(path):
     text = text.replace('</h1> <div class="tw-block lg:tw-hidden jsActions2">', '</h2> <div class="tw-block lg:tw-hidden jsActions2">')
     text = text.replace("Heema Sahni is a India-based Interior Architect...", DESCRIPTION)
     text = text.replace("Heema Sahni Chhabra is a India-based Interior Architect...", DESCRIPTION)
+    text = re.sub(r'(about:\s*\{\s*slug:\s*"about",\s*description:\s*)"[^"]*"', rf'\1"{ABOUT_TITLE}"', text)
+    payload_html = json.dumps(ABOUT_PAYLOAD_HTML, ensure_ascii=False)[1:-1]
+    text = re.sub(r'content_1:\s*"[^"]*"', f'content_1: "{payload_html}"', text)
+    text = re.sub(r'content_2:\s*"[^"]*"', 'content_2: ""', text)
+    text = text.replace("Born and raised in London...", ABOUT_CONTENT_1)
+    text = text.replace("Designing all aspects of interior architecture and loose furnishings...", ABOUT_CONTENT_2)
+    text = text.replace("interior architecture", "interior design")
+    text = text.replace("Born and raised", "Our work begins with")
+    text = text.replace("Designing all aspects", "Developing interiors through")
+    text = text.replace("Interior Architect", "Interior Designer")
     text = text.replace('alt="Portrait Heema Sahni chhabra"', 'alt="Heema Chhabra, founder of HCDC"')
     text = text.replace('/_nuxt/img/portrait_naguissa.81547ad.jpg', '/_nuxt/img/portrait-hcdc.jpg')
     start = text.find('<div class="about ')
@@ -46,14 +66,23 @@ def patch_html(path):
     text = text[:start] + ABOUT_BLOCK + text[end:]
     text = text.replace('class="about tw-fixed tw-right-0 lg:tw-h-screen tw-bg-black tw-z-40"', 'class="about tw-fixed tw-right-0 lg:tw-h-screen tw-bg-black tw-z-40"')
     text = text.replace("<nav class=\"mainnav\"", '<nav aria-label="Primary navigation" class="mainnav"')
+    text = text.replace('class="tw-absolute tw-left-0 tw-top-0 tw-w-1/2 tw-h-screen tw-bg-transparent tw-z-10 focus:tw-outline-none focus:tw-ring-0 tw-rounded-none nocursor">', 'class="tw-absolute tw-left-0 tw-top-0 tw-w-1/2 tw-h-screen tw-bg-transparent tw-z-10 focus:tw-outline-none focus:tw-ring-0 tw-rounded-none nocursor" type="button" aria-label="Previous project">', 1)
+    text = text.replace('class="tw-absolute tw-right-0 tw-top-0 tw-w-1/2 tw-h-screen tw-bg-transparent tw-z-10 focus:tw-outline-none focus:tw-ring-0 tw-rounded-none nocursor">', 'class="tw-absolute tw-right-0 tw-top-0 tw-w-1/2 tw-h-screen tw-bg-transparent tw-z-10 focus:tw-outline-none focus:tw-ring-0 tw-rounded-none nocursor" type="button" aria-label="Next project">', 1)
     text = text.replace('class="nocursor button-home">Home</button>', 'class="nocursor button-home" type="button" aria-label="Return to home">Home</button>')
     text = text.replace('class="nocursor">About &amp; Contact</button>', 'class="nocursor" type="button" aria-label="Open About and Contact panel">About &amp; Contact</button>')
     text = text.replace('class="btn-close tw-absolute', 'class="btn-close tw-absolute')
     text = text.replace('href="mailto:hello@heemachhabra.com"', f'href="mailto:{EMAIL}"').replace('>hello@heemachhabra.com<', f'>{EMAIL}<')
-    for old in ["Paris 16ème, France", "Paris 7ème, France", "Paris, France", "Brussels, Belgium", "Uccle, Belgique", "Rhode Saint Genèse, Belgium", "Rhode Saint Gen�se, Belgium", "Rhodes Saint Genèse, Belgium", "Rhodes Saint Gen�se, Belgium", "Ramatuelle, France", "Biarritz, France"]:
+    gallery_text = [
+        "Paris 16ème, France", "Paris 7ème, France", "Paris, France", "Brussels, Belgium", "Uccle, Belgique",
+        "Rhode Saint Genèse, Belgium", "Rhode Saint Gen�se, Belgium", "Rhodes Saint Genèse, Belgium", "Rhodes Saint Gen�se, Belgium",
+        "Ramatuelle, France", "Biarritz, France", "Galerie Jean-Jacques Dutko", "Design Basel 2012",
+        "Selected interior composition", "HCDC — selected interior composition", "HCDC � selected interior composition",
+        "Photos: Alexis Toureau", "Photo: Catalina Mesa", "Photos: Catalina Mesa", "Photos: Spectrum", "Photo: Spectrum", "Photos: Caféine",
+        "Interior Design: NTD<br>\n        Architecture: Emmanuel Bonnewijn", "Interior Design: NTD<br>\n            Architecture: Emmanuel Bonnewijn", "In collaboration with: Johanna Amatoury Interior",
+    ]
+    for old in gallery_text:
         text = text.replace(old, GENERIC_CAPTION)
-    for old in ["Photos: Alexis Toureau", "Photo: Catalina Mesa", "Photos: Catalina Mesa", "Photos: Spectrum", "Photo: Spectrum", "Photos: Caféine", "Interior Design: NTD<br>\n        Architecture: Emmanuel Bonnewijn", "Interior Design: NTD<br>\n            Architecture: Emmanuel Bonnewijn", "In collaboration with: Johanna Amatoury Interior"]:
-        text = text.replace(old, GENERIC_CAPTION)
+    text = re.sub(r'<(h[34])([^>]*class="[^"]*(?:title|subtitle)[^"]*"[^>]*)>\s*</\1>', lambda match: f'<{match.group(1)}{match.group(2)}></{match.group(1)}>', text)
     text = text.replace('<img alt="" class="lazyLoad isLoaded"', '<img alt="Interior composition from the HCDC portfolio" class="lazyLoad isLoaded"')
     text = re.sub(r'<img(?![^>]*\balt=)', '<img alt=""', text)
     text = text.replace('<img data-src="', '<img loading="lazy" data-src="')
@@ -93,9 +122,32 @@ def patch_payload(path):
         "more than 40 projects": "considered interiors",
         "Paris, Monaco, St Tropez and Brussels": "private homes and commercial spaces",
         "French and Japanese heritage": "a client-specific design language",
+        "portrait_naguissa.81547ad.jpg": "portrait-hcdc.jpg",
+        "img/.81547ad.jpg": "img/portrait-hcdc.jpg",
+        "n.exports=e.p+\"img/.81547ad.jpg\"": "n.exports=e.p+\"img/portrait-hcdc.jpg\"",
+        "n.exports=e.p+\"\"": "n.exports=e.p+\"img/portrait-hcdc.jpg\"",
+        "return t(\"h2\",{staticClass:\"tw-font-grotesk-rg tw-text-black\"},[n._v(\"\\n      HEEMA \"),t(\"span\",{staticClass:\"tw-font-grotesk-bd\"},[n._v(\"CHHABRA\")]),n._v(\" DESIGN\\n    \")])": "return t(\"h1\",{staticClass:\"tw-font-grotesk-rg tw-text-black\"},[n._v(\"\\n      HEEMA \"),t(\"span\",{staticClass:\"tw-font-grotesk-bd\"},[n._v(\"CHHABRA\")]),n._v(\" DESIGN CONSULTANT\\n    \")])",
+        "Interior Design: HCDC": GENERIC_CAPTION,
+        "http://www.woodage.in/": "https://heemachhabra.com/",
+        "https://www.woodage.in/": "https://heemachhabra.com/",
+        "http://woodage.in": "https://heemachhabra.com",
+        "https://woodage.in": "https://heemachhabra.com",
+        "woodage.in": "heemachhabra.com",
+        "t(\"h1\",{ref:\"jsText\",staticClass:\"tw-font-times-lt tw-text-2xl tw-text-white\"},[n._v(n._s(n.related.description))])": "t(\"h2\",{ref:\"jsText\",staticClass:\"tw-font-times-lt tw-text-2xl tw-text-white\"},[n._v(\"Bespoke Interior Design in London\")])",
+        "staticClass:\"tw-absolute tw-left-0 tw-top-0 tw-w-1/2 tw-h-screen tw-bg-transparent tw-z-10 focus:tw-outline-none focus:tw-ring-0 tw-rounded-none nocursor\",on:{click:t.goToPrevious}": "staticClass:\"tw-absolute tw-left-0 tw-top-0 tw-w-1/2 tw-h-screen tw-bg-transparent tw-z-10 focus:tw-outline-none focus:tw-ring-0 tw-rounded-none nocursor\",attrs:{type:\"button\",\"aria-label\":\"Previous project\"},on:{click:t.goToPrevious}",
+        "staticClass:\"tw-absolute tw-right-0 tw-top-0 tw-w-1/2 tw-h-screen tw-bg-transparent tw-z-10 focus:tw-outline-none focus:tw-ring-0 tw-rounded-none nocursor\",on:{click:t.goToNext}": "staticClass:\"tw-absolute tw-right-0 tw-top-0 tw-w-1/2 tw-h-screen tw-bg-transparent tw-z-10 focus:tw-outline-none focus:tw-ring-0 tw-rounded-none nocursor\",attrs:{type:\"button\",\"aria-label\":\"Next project\"},on:{click:t.goToNext}",
+        "t(\"h2\",{staticClass:\"tw-font-grotesk-rg tw-text-black\"},[n._v(\"\\n      HEEMA \"),t(\"span\",{staticClass:\"tw-font-grotesk-bd\"},[n._v(\"CHHABRA\")]),n._v(\" DESIGN\\n    \")])": "t(\"h1\",{staticClass:\"tw-font-grotesk-rg tw-text-black\"},[n._v(\"\\n      HEEMA \"),t(\"span\",{staticClass:\"tw-font-grotesk-bd\"},[n._v(\"CHHABRA\")]),n._v(\" DESIGN CONSULTANT\\n    \")])",
+        "attrs:{href:\"https://woodage.in\",target:\"_blank\",rel:\"nofollow\"},on:{mouseover:function(t){return n.handleHover(!0)},mouseleave:function(t){return n.handleHover(!1)}}},[n._v(n._s(n.textHover))]": "attrs:{href:\"mailto:info@heemachhabra.com\",rel:\"nofollow\"}},[n._v(\"Start a conversation\") ]",
     }
     for old, new in replacements.items():
         text = text.replace(old, new)
+    payload_html = json.dumps(ABOUT_PAYLOAD_HTML, ensure_ascii=False)[1:-1]
+    text = re.sub(r'content_1:"[^"]*"', f'content_1:"{payload_html}"', text)
+    text = re.sub(r'content_2:"[^"]*"', 'content_2:""', text)
+    text = text.replace("Born and raised in London...", ABOUT_CONTENT_1)
+    text = text.replace("Designing all aspects of interior architecture and loose furnishings...", ABOUT_CONTENT_2)
+    text = text.replace("designing all aspects of interior architecture and loose furnishings.", ABOUT_CONTENT_2)
+    text = text.replace("interior architecture", "interior design")
     path.write_text(text, encoding="utf-8")
 
 
@@ -120,6 +172,11 @@ def patch_bundles():
         "Rhode Saint Gen�se, Belgium": GENERIC_CAPTION,
         "Ramatuelle, France": GENERIC_CAPTION,
         "Biarritz, France": GENERIC_CAPTION,
+        "Galerie Jean-Jacques Dutko": GENERIC_CAPTION,
+        "Design Basel 2012": GENERIC_CAPTION,
+        "Selected interior composition": GENERIC_CAPTION,
+        "HCDC — selected interior composition": GENERIC_CAPTION,
+        "HCDC � selected interior composition": GENERIC_CAPTION,
         "Photos: Alexis Toureau": GENERIC_CAPTION,
         "Photos: Catalina Mesa": GENERIC_CAPTION,
         "Photo: Catalina Mesa": GENERIC_CAPTION,
@@ -130,14 +187,25 @@ def patch_bundles():
         "Interior Design: NTD": GENERIC_CAPTION,
         "Architecture: Emmanuel Bonnewijn": GENERIC_CAPTION,
         "In collaboration with: Johanna Amatoury Interior": GENERIC_CAPTION,
+        "Interior Design: HCDC": GENERIC_CAPTION,
         "India-based Interior Architect": "London-based interior designer",
         "Interior Architect": "Interior Designer",
         "French and Japanese heritage": "a client-specific design language",
     }
+    prohibited = [
+        "Galerie Jean-Jacques Dutko", "Design Basel 2012", "Born and raised", "Designing all aspects", "interior architecture",
+        "Selected interior composition", "HCDC — selected interior composition", "HCDC � selected interior composition", "Interior Design: HCDC",
+        "Heema Sahni", "Naguissa", "NTD", "Paris", "Brussels", "Uccle", "Ramatuelle", "Biarritz", "Belgium", "France",
+        "Alexis", "Catalina", "Caféine", "Cafeine", "Spectrum", "Emmanuel", "Johanna", "woodage.in", "portrait_naguissa", "img/.81547ad.jpg",
+    ]
     for path in BUNDLE_FILES:
         text = path.read_text(encoding="utf-8")
         for old, new in replacements.items():
             text = text.replace(old, new)
+        for old in prohibited:
+            text = text.replace(old, GENERIC_CAPTION)
+        text = text.replace('n.exports=e.p+""', 'n.exports=e.p+"img/portrait-hcdc.jpg"')
+        text = text.replace('t("h2",{staticClass:"tw-font-grotesk-rg tw-text-black"},[n._v("\\n      HEEMA "),t("span",{staticClass:"tw-font-grotesk-bd"},[n._v("CHHABRA")]),n._v(" DESIGN\\n    ")])', 't("h1",{staticClass:"tw-font-grotesk-rg tw-text-black"},[n._v("\\n      HEEMA "),t("span",{staticClass:"tw-font-grotesk-bd"},[n._v("CHHABRA")]),n._v(" DESIGN CONSULTANT\\n    ")])')
         path.write_text(text, encoding="utf-8")
 
 
