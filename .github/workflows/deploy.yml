@@ -5,6 +5,12 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry-run SFTP preflight only (no production writes)"
+        required: false
+        default: "false"
+        type: boolean
 
 permissions:
   contents: read
@@ -16,6 +22,7 @@ concurrency:
 # ED25519 host key fingerprint verified on 2026-08-19 via ssh-keyscan against 103.92.235.110:22.
 env:
   HOST_KEY_SHA256: "SHA256:4+VB3nUB/C7jLTNCIwJg8oCG1gjWIu40u6fL7n5ON2o"
+  PRODUCTION_URL: "https://heemachhabra.com"
 
 jobs:
   validate:
@@ -25,6 +32,8 @@ jobs:
         uses: actions/checkout@v7.0.1
       - name: Validate site
         run: python3 scripts/validate-site.py
+      - name: Compile release scripts
+        run: python3 -m py_compile scripts/migrate_hcdc.py scripts/validate-site.py scripts/package-site.py scripts/sftp_deploy.py
       - name: Build deployment archive
         run: python3 scripts/package-site.py --output site-release.tar.gz
 
@@ -36,21 +45,27 @@ jobs:
         uses: actions/checkout@v7.0.1
       - name: Validate site before network access
         run: python3 scripts/validate-site.py
+      - name: Compile release scripts
+        run: python3 -m py_compile scripts/migrate_hcdc.py scripts/validate-site.py scripts/package-site.py scripts/sftp_deploy.py
       - name: Package release
         run: python3 scripts/package-site.py --output site-release.tar.gz
+      - name: Install deployment dependency
+        run: python3 -m pip install --quiet paramiko
       - name: Configure SSH
         env:
           HR_SSH_KEY: ${{ secrets.HR_SSH_KEY }}
         run: |
           set -euo pipefail
+          test -n "${{ vars.HR_SSH_HOST }}"
+          test -n "${{ vars.HR_SSH_PORT }}"
+          test -n "${{ vars.HR_SSH_USER }}"
           test -n "${{ vars.HR_DEPLOY_PATH }}"
           install -m 700 -d "$HOME/.ssh"
           printf '%s\n' "$HR_SSH_KEY" > "$HOME/.ssh/deploy_key"
           chmod 600 "$HOME/.ssh/deploy_key"
-      - name: Deploy via SFTP
+      - name: SFTP network preflight
         run: |
           set -euo pipefail
-          python3 -m pip install --quiet paramiko
           python3 scripts/sftp_deploy.py \
             --host "${{ vars.HR_SSH_HOST }}" \
             --port "${{ vars.HR_SSH_PORT }}" \
@@ -59,4 +74,21 @@ jobs:
             --key "$HOME/.ssh/deploy_key" \
             --host-key-sha256 "$HOST_KEY_SHA256" \
             --archive site-release.tar.gz \
-            --production-url "https://heemachhabra.com"
+            --production-url "$PRODUCTION_URL" \
+            --dry-run
+      - name: Deploy via SFTP
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: |
+          set -euo pipefail
+          python3 scripts/sftp_deploy.py \
+            --host "${{ vars.HR_SSH_HOST }}" \
+            --port "${{ vars.HR_SSH_PORT }}" \
+            --user "${{ vars.HR_SSH_USER }}" \
+            --deploy-path "${{ vars.HR_DEPLOY_PATH }}" \
+            --key "$HOME/.ssh/deploy_key" \
+            --host-key-sha256 "$HOST_KEY_SHA256" \
+            --archive site-release.tar.gz \
+            --production-url "$PRODUCTION_URL"
+      - name: Remove temporary SSH key
+        if: ${{ always() }}
+        run: rm -f "$HOME/.ssh/deploy_key"
