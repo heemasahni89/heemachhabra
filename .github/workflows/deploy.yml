@@ -1,0 +1,81 @@
+name: Deploy production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hcdc-production
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Validate site
+        run: python3 scripts/validate-site.py
+      - name: Package production release
+        run: python3 scripts/package-site.py --output site-release.tar.gz
+
+  deploy:
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      HOSTING_HOST: ${{ secrets.HOSTING_HOST }}
+      HOSTING_PORT: ${{ secrets.HOSTING_PORT }}
+      HOSTING_USER: ${{ secrets.HOSTING_USER }}
+      HOSTING_TARGET_PATH: ${{ secrets.HOSTING_TARGET_PATH }}
+      PRODUCTION_URL: ${{ secrets.PRODUCTION_URL }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Validate site before network access
+        run: python3 scripts/validate-site.py
+      - name: Package release
+        run: python3 scripts/package-site.py --output site-release.tar.gz
+      - name: Configure SSH
+        env:
+          HOSTING_SSH_KEY: ${{ secrets.HOSTING_SSH_KEY }}
+          HOSTING_KNOWN_HOSTS: ${{ secrets.HOSTING_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          test -n "$HOSTING_HOST" && test -n "$HOSTING_PORT" && test -n "$HOSTING_USER" && test -n "$HOSTING_TARGET_PATH" && test -n "$PRODUCTION_URL"
+          test -n "$HOSTING_SSH_KEY" && test -n "$HOSTING_KNOWN_HOSTS"
+          install -m 700 -d "$HOME/.ssh"
+          printf '%s\n' "$HOSTING_SSH_KEY" > "$HOME/.ssh/deploy_key"
+          chmod 600 "$HOME/.ssh/deploy_key"
+          printf '%s\n' "$HOSTING_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 644 "$HOME/.ssh/known_hosts"
+      - name: Preflight SSH and target safety
+        run: |
+          set -euo pipefail
+          ssh -p "$HOSTING_PORT" -i "$HOME/.ssh/deploy_key" "$HOSTING_USER@$HOSTING_HOST" 'set -eu; printf "%s\n" "$HOME"; test -n "$HOME"'
+          ssh -p "$HOSTING_PORT" -i "$HOME/.ssh/deploy_key" "$HOSTING_USER@$HOSTING_HOST" "set -eu; target='$HOSTING_TARGET_PATH'; case \"\$target\" in /|\"\$HOME\"|\"\$HOME/\") echo 'Unsafe deployment target' >&2; exit 1;; esac; test -d \"\$target\"; test -w \"\$target\"; df -Pk \"\$target\""
+      - name: Stage archive
+        run: |
+          set -euo pipefail
+          RELEASE_ID="${GITHUB_SHA}"
+          REMOTE_RELEASE="$HOSTING_USER@$HOSTING_HOST:$HOME/.hcdc-releases/$RELEASE_ID"
+          ssh -p "$HOSTING_PORT" -i "$HOME/.ssh/deploy_key" "$HOSTING_USER@$HOSTING_HOST" "set -eu; mkdir -p \"\$HOME/.hcdc-releases/$RELEASE_ID\"; test -d \"\$HOME/.hcdc-releases/$RELEASE_ID\""
+          scp -P "$HOSTING_PORT" -i "$HOME/.ssh/deploy_key" site-release.tar.gz "$REMOTE_RELEASE/site-release.tar.gz"
+          ssh -p "$HOSTING_PORT" -i "$HOME/.ssh/deploy_key" "$HOSTING_USER@$HOSTING_HOST" "set -eu; cd \"\$HOME/.hcdc-releases/$RELEASE_ID\"; tar -xzf site-release.tar.gz; test -f index.html; test -d _nuxt; test -f robots.txt; test -f sitemap.xml; test -f 404.html"
+      - name: Back up and deploy staged release
+        run: |
+          set -euo pipefail
+          RELEASE_ID="${GITHUB_SHA}"
+          BACKUP_ID="$(date -u +%Y%m%d-%H%M%S)"
+          ssh -p "$HOSTING_PORT" -i "$HOME/.ssh/deploy_key" "$HOSTING_USER@$HOSTING_HOST" "set -eu; target='$HOSTING_TARGET_PATH'; backup=\"\$HOME/.hcdc-backups/$BACKUP_ID\"; release=\"\$HOME/.hcdc-releases/$RELEASE_ID\"; mkdir -p \"\$backup\"; tar -czf \"\$backup/site-before.tar.gz\" --exclude='./.well-known/acme-challenge' --exclude='./.well-known/pki-validation' -C \"\$target\" .; test -s \"\$backup/site-before.tar.gz\"; find \"\$release\" -mindepth 1 -maxdepth 1 ! -name site-release.tar.gz -exec cp -a {} \"\$target/\" \;; test -f \"\$target/index.html\""
+      - name: Production smoke test
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location "$PRODUCTION_URL/" > /dev/null
+          curl --fail --silent --show-error --location "$PRODUCTION_URL/robots.txt" > /dev/null
+          curl --fail --silent --show-error --location "$PRODUCTION_URL/sitemap.xml" > /dev/null
