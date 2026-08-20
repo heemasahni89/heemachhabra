@@ -75,7 +75,31 @@ def main():
     try:
         sitemap = ET.parse(ROOT / "sitemap.xml").getroot()
         locs = [node.text for node in sitemap.iter() if node.tag.endswith("}loc")]
-        if locs != [CANONICAL]: fail(errors, f"sitemap URLs mismatch: {locs}")
+        expected = [CANONICAL] + [f"{CANONICAL}{p}/" for p in ["about", "services", "approach", "contact"]]
+        if locs not in ([CANONICAL], expected): fail(errors, f"sitemap URLs mismatch: {locs}")
+        for loc in locs:
+            rel = loc.replace(CANONICAL, "").strip("/")
+            target = ROOT / rel / "index.html" if rel else ROOT / "index.html"
+            if not target.exists():
+                fail(errors, f"sitemap URL has no file: {loc}")
+            if loc != CANONICAL:
+                html = target.read_text(encoding="utf-8")
+                if f'rel="canonical" href="{loc}"' not in html and f"rel='canonical' href='{loc}'" not in html:
+                    fail(errors, f"sitemap URL canonical mismatch: {loc}")
+                checks2 = HTMLChecks(); checks2.feed(html)
+                if checks2.h1 != 1:
+                    fail(errors, f"{loc} must contain exactly one h1")
+        for name in ["about", "services", "approach", "contact"]:
+            html = (ROOT / name / "index.html").read_text(encoding="utf-8")
+            checks_e = HTMLChecks(); checks_e.feed(html)
+            if checks_e.canonical != [f"{CANONICAL}{name}/"]:
+                fail(errors, f"{name}/ canonical mismatch: {checks_e.canonical}")
+            try: json.loads("".join("".join(s) for s in checks_e.scripts))
+            except json.JSONDecodeError as exc: fail(errors, f"invalid JSON-LD in {name}/: {exc}")
+            if 'property="og:image" content="https://heemachhabra.com/og-image.jpg"' not in html:
+                fail(errors, f"{name}/ missing og:image")
+            if 'name="twitter:card" content="summary_large_image"' not in html:
+                fail(errors, f"{name}/ missing twitter card")
     except ET.ParseError as exc: fail(errors, f"invalid sitemap XML: {exc}")
     for path in ROOT.rglob("*"):
         if path.is_file() and (".git" in path.parts or ".commandcode" in path.parts): continue

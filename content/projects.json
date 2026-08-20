@@ -1,0 +1,5 @@
+{
+  "galleryLabel": "Selected Interior Work",
+  "projects": [],
+  "notes": "Add verified projects only. Each project must have verified=true and factual fields before its caption is rendered. Images without verified provenance keep accurate visual alt text only."
+}

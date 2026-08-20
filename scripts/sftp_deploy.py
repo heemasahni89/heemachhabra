@@ -156,12 +156,13 @@ def fingerprint(key: paramiko.PKey) -> str:
 
 def connect(host: str, port: int, user: str, key_path: str, expected_sha256: str):
     sock = socket.create_connection((host, port), timeout=15)
+    sock.settimeout(120)
     transport = paramiko.Transport(sock)
-    transport.banner_timeout = 15
-    transport.auth_timeout = 15
-    transport.channel_timeout = 15
+    transport.banner_timeout = 30
+    transport.auth_timeout = 30
+    transport.channel_timeout = 120
     try:
-        transport.start_client(timeout=15)
+        transport.start_client(timeout=30)
         remote_key = transport.get_remote_server_key()
         actual = fingerprint(remote_key)
         expected = expected_sha256 or EXPECTED_HOST_KEY
@@ -185,14 +186,16 @@ def connect(host: str, port: int, user: str, key_path: str, expected_sha256: str
 
 
 def assert_safe_target(target_path: str, account_home: str) -> str:
-    target = target_path.strip()
-    if not target or target == "/" or target in ("$HOME", "$home") or target.endswith("/"):
+    raw = target_path.strip()
+    if not raw or raw == "/" or raw in ("$HOME", "$home") or raw.endswith("/"):
         raise DeploymentError(f"REJECTED unsafe deploy target: {target_path!r}")
-    if "$" in target or ".." in posixpath.normpath(target).split("/"):
+    if "$" in raw or "\\" in raw or ".." in raw.split("/"):
         raise DeploymentError(f"REJECTED unsafe deploy target: {target_path!r}")
-    if not target.startswith(account_home + "/"):
-        raise DeploymentError(f"REJECTED target not under hosting account home {account_home}: {target_path!r}")
-    return target
+    expected = posixpath.normpath(f"{account_home}/public_html")
+    normalized = posixpath.normpath(raw)
+    if normalized != expected:
+        raise DeploymentError(f"REJECTED deploy target must be {expected}: {target_path!r}")
+    return normalized
 
 
 def inspect_remote_targets(
@@ -229,6 +232,7 @@ def inspect_remote_targets(
 
 def upload_dir(sftp: paramiko.SFTPClient, local_dir: str, remote_dir: str) -> dict[str, int]:
     uploaded: dict[str, int] = {}
+    total = 0
     for root, dirs, files in os.walk(local_dir):
         dirs.sort()
         files.sort()
@@ -237,12 +241,16 @@ def upload_dir(sftp: paramiko.SFTPClient, local_dir: str, remote_dir: str) -> di
             rel = os.path.relpath(source, local_dir).replace(os.sep, "/")
             destination = posixpath.join(remote_dir, rel)
             sftp_mkdir_all(sftp, posixpath.dirname(destination))
+            print(f"Uploading {rel} ({os.path.getsize(source)} bytes)...")
             sftp.put(source, destination)
             attrs = sftp.stat(destination)
             expected_size = os.path.getsize(source)
             if not mode_is_regular(attrs.st_mode) or attrs.st_size != expected_size:
                 raise DeploymentError(f"Staged file verification failed: {rel}")
             uploaded[rel] = expected_size
+            total += 1
+            if total % 20 == 0:
+                print(f"Staged progress: {total} files uploaded")
     return uploaded
 
 

@@ -5,7 +5,7 @@ import tarfile
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT = ROOT / "site-release.tar.gz"
 REQUIRED = ["index.html", "robots.txt", "sitemap.xml", "404.html", "_nuxt"]
-EXCLUDED_PARTS = {".git", ".github", ".commandcode", ".well-known", "docs", "scripts", "node_modules"}
+EXCLUDED_PARTS = {".git", ".github", ".commandcode", ".well-known", "docs", "scripts", "node_modules", "content", "tests"}
 EXCLUDED_NAMES = {"README.md", "website.pptx", "website.ppt", ".gitignore", ".gitattributes", "site-release.tar.gz"}
 
 

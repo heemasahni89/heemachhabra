@@ -1,0 +1,129 @@
+{
+  "brand": {
+    "name": "Heema Chhabra Design Consultant",
+    "shortName": "HCDC",
+    "legalName": "Heema Chhabra Design Consultant"
+  },
+  "person": {
+    "name": "Heema Chhabra",
+    "jobTitle": "Design Consultant"
+  },
+  "location": {
+    "city": "London",
+    "country": "United Kingdom",
+    "label": "London, United Kingdom",
+    "consultationNote": "Consultations by appointment."
+  },
+  "contact": {
+    "email": "info@heemachhabra.com",
+    "instagram": "https://www.instagram.com/heemachhabradesignconsultant/"
+  },
+  "canonical": "https://heemachhabra.com/",
+  "seo": {
+    "home": {
+      "title": "Heema Chhabra Design Consultant | Interior Design London",
+      "description": "London-based interior design studio for private homes, commercial spaces and property development, balancing spatial planning, materials, lighting and bespoke detail."
+    },
+    "about": {
+      "title": "About Heema Chhabra Design Consultant | London",
+      "description": "Meet Heema Chhabra and discover the client-led philosophy behind HCDC, a London interior design practice focused on considered, personal spaces."
+    },
+    "services": {
+      "title": "Interior Design Services in London | HCDC",
+      "description": "Residential, commercial and property-development interior design in London, from spatial planning and material direction to joinery, furniture, lighting and finishing detail."
+    },
+    "approach": {
+      "title": "Interior Design Process | HCDC London",
+      "description": "Explore HCDC's considered interior design process, from understanding the brief and developing the concept to curation, detailing and implementation-ready design decisions."
+    },
+    "contact": {
+      "title": "Contact HCDC | Interior Design Consultation London",
+      "description": "Start a conversation with Heema Chhabra Design Consultant about a residential, commercial or property-development interior design project."
+    }
+  },
+  "hero": {
+    "h1": "Heema Chhabra Design Consultant",
+    "context": "Interior Design \u00b7 London",
+    "primaryLine": "Spaces That Reflect Who You Are.",
+    "supporting": "Considered residential, commercial and development interiors shaped around the people who use them \u2014 balancing spatial clarity, materiality, light and detail.",
+    "secondaryLanguage": "Quiet Luxury \u00b7 Timeless Sophistication \u00b7 Bespoke Craftsmanship \u00b7 Personalised Design",
+    "ctaPrimary": { "label": "Explore the Approach", "href": "/approach/" },
+    "ctaSecondary": { "label": "Interior Design Services", "href": "/services/" },
+    "ctaConversion": { "label": "Start a Conversation", "href": "/contact/" }
+  },
+  "introduction": {
+    "paragraphs": [
+      "Exceptional interiors are not created simply to be admired. They are created to be lived in, experienced and remembered.",
+      "At Heema Chhabra Design Consultant, every brief begins with the people behind the space \u2014 how they live or work, what they need, what they value and how they want the interior to feel.",
+      "From that understanding, HCDC develops a coherent design through planning, proportion, materiality, light, furniture, joinery and carefully resolved detail."
+    ]
+  },
+  "philosophy": {
+    "heading": "Beauty With Purpose",
+    "paragraphs": [
+      "Beauty should never come at the expense of function. We consider how a space is used, how people move through it and how it should feel, then resolve proportion, circulation, light, material, texture, furniture, storage and everyday practicality as one connected composition.",
+      "The result should feel considered rather than over-designed: refined, personal and capable of enduring beyond a passing trend."
+    ]
+  },
+  "approach": {
+    "heading": "The Heema Chhabra Approach",
+    "subheading": "Listen. Understand. Design. Refine.",
+    "intro": "HCDC does not begin with a predetermined signature look. The design language develops from the client, the property and the purpose of the space.",
+    "stages": [
+      { "id": "understand", "label": "01 \u2014 UNDERSTAND", "title": "Understand", "body": "Every project begins with conversation. We establish how the space is used, what needs to change, the client\u2019s functional requirements, aesthetic preferences and the atmosphere they want to create." },
+      { "id": "conceptualise", "label": "02 \u2014 CONCEPTUALISE", "title": "Conceptualise", "body": "The brief becomes a clear design direction through layout, spatial planning, proportion, colour, materiality, lighting and the overall character of the interior." },
+      { "id": "curate", "label": "03 \u2014 CURATE", "title": "Curate", "body": "Materials, finishes, furniture, lighting, fabrics, artwork and accessories are considered together rather than selected as isolated pieces." },
+      { "id": "detail", "label": "04 \u2014 DETAIL", "title": "Detail", "body": "Joinery, transitions, proportions, lighting, finishes and practical details are resolved from the scale of the room down to the points where materials meet." },
+      { "id": "execute", "label": "05 \u2014 EXECUTE", "title": "Execute", "body": "The design is developed so that key decisions, specifications and details can be carried into implementation with clarity and consistency within the agreed scope." },
+      { "id": "experience", "label": "06 \u2014 EXPERIENCE", "title": "Experience", "body": "A successful interior is measured not only by how it photographs, but by how naturally it supports the people who live, work or spend time there." }
+    ]
+  },
+  "services": {
+    "intro": {
+      "heading": "Interior Design Services",
+      "body": "Every project is different, so the scope is tailored to the property, client and stage of work rather than treating every service as automatically included."
+    },
+    "residential": {
+      "heading": "Residential Interior Design",
+      "body": "A home should feel like an expression of the people who live there. HCDC develops residential interiors as a coherent whole \u2014 balancing layout, comfort, proportion, materiality, lighting and detail rather than treating rooms as isolated decorative exercises.",
+      "rooms": ["Living rooms", "Dining spaces", "Bedrooms", "Kitchens", "Bathrooms", "Home offices", "Walk-in wardrobes", "Entertainment spaces", "Complete homes"],
+      "scope": ["Space planning and layout development", "Material and finish selection", "Bespoke furniture", "Custom cabinetry and joinery", "Lighting concepts", "Furniture specification", "Soft furnishings", "Art and accessories", "Styling and finishing"],
+      "scopeNote": "Not every service is included in every commission; scope is agreed per brief."
+    },
+    "privateResidences": {
+      "heading": "Private Residences",
+      "body": "For more comprehensive private-residence briefs, architecture, furniture, lighting, materials, joinery and decorative layers are considered together so that the home develops as one composition. The objective is not luxury for its own sake, but an interior with character, comfort and longevity \u2014 tailored to the way its occupants live."
+    },
+    "commercial": {
+      "heading": "Commercial Interior Design",
+      "body": "A commercial interior is part of how a business is experienced. HCDC considers identity, function, circulation, atmosphere, durability and user behaviour together so that the space supports both the organisation and the people using it."
+    },
+    "development": {
+      "heading": "Builder & Property Development Interiors",
+      "body": "HCDC works with builders and property developers on interior concepts that balance design identity, buyer appeal, usability and considered specification.",
+      "scope": ["Show homes", "Common areas", "Spatial planning", "Material palettes", "Furniture direction", "Lighting concepts", "Finish selections", "Design guidelines"]
+    }
+  },
+  "founder": {
+    "heading": "Meet Heema Chhabra",
+    "body": "Heema Chhabra is the designer behind Heema Chhabra Design Consultant, a London-based practice focused on considered residential, commercial and development interiors."
+  },
+  "contactPage": {
+    "heading": "Start a Conversation",
+    "body": "Every project begins with a conversation. If you are planning a residential, commercial or development interior, tell us where the project is, what you would like to change and the stage you are at. We can then identify the most useful next step.",
+    "location": "London, United Kingdom",
+    "consultationNote": "Consultations by appointment.",
+    "email": "info@heemachhabra.com",
+    "instagram": "https://www.instagram.com/heemachhabradesignconsultant/"
+  },
+  "faq": [
+    { "q": "What type of interior design projects does HCDC work on?", "a": "HCDC works on residential interiors and private residences, commercial spaces, and builder or property-development projects. The design scope is tailored to each property, brief and stage of work." },
+    { "q": "Where is Heema Chhabra Design Consultant based?", "a": "HCDC is based in London, United Kingdom. Consultations are arranged by appointment." },
+    { "q": "What can a residential interior design scope include?", "a": "Depending on the brief, residential design can include space planning, layout development, materials and finishes, lighting concepts, bespoke furniture and joinery, cabinetry, furniture specification, soft furnishings, art and styling." },
+    { "q": "How does an HCDC project begin?", "a": "Every project begins with a conversation to understand the property, the people using it, functional requirements, aesthetic preferences, priorities and the current stage of the project." },
+    { "q": "Does HCDC work with builders and property developers?", "a": "Yes. Depending on the project, HCDC can support interior concepts, show homes, common areas, spatial planning, material palettes, furniture and lighting direction, finish selection and design guidelines." },
+    { "q": "How much does interior design cost?", "a": "Interior-design fees depend on the scale, scope and stage of the project rather than a single standard price. Share the project location, property type, areas involved and the support required so that an appropriate scope can be discussed." },
+    { "q": "When should I contact an interior designer?", "a": "It is useful to start the conversation early enough for layout, materials, lighting, joinery and furniture decisions to be considered together rather than resolved separately later in the project." },
+    { "q": "How can I enquire?", "a": "Email info@heemachhabra.com with the project location, type of property or space, what you would like to change and the current stage of the project." }
+  ]
+}
